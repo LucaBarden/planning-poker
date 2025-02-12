@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Room - [[${roomName}]]</title>
+    <link rel="stylesheet" type="text/css" href="/css/styles.css">
+    <!-- Include SockJS and STOMP from CDN -->
+    <script src="https://cdn.jsdelivr.net/sockjs/1.1.2/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <h1>Room: <span th:text="${roomName}">Room Name</span></h1>
+    <!-- Join form: ask for the user’s name -->
+    <div id="userForm">
+        <label for="userName">Enter your name:</label>
+        <input type="text" id="userName" placeholder="Your name">
+        <button id="joinBtn">Join Room</button>
+    </div>
+    <!-- Game area (hidden until the user joins) -->
+    <div id="gameArea" style="display:none;">
+        <div id="cardChoices">
+            <h2>Select a Card</h2>
+            <div class="cards">
+                <!-- List of planning poker cards -->
+                <div class="card" data-value="0">0</div>
+                <div class="card" data-value="1/2">1/2</div>
+                <div class="card" data-value="1">1</div>
+                <div class="card" data-value="2">2</div>
+                <div class="card" data-value="3">3</div>
+                <div class="card" data-value="5">5</div>
+                <div class="card" data-value="8">8</div>
+                <div class="card" data-value="13">13</div>
+                <div class="card" data-value="20">20</div>
+                <div class="card" data-value="40">40</div>
+                <div class="card" data-value="100">100</div>
+                <div class="card" data-value="?">?</div>
+            </div>
+        </div>
+        <div id="roomStatus">
+            <h2>Players</h2>
+            <ul id="playersList"></ul>
+        </div>
+        <div id="controls">
+            <button id="revealBtn">Reveal Cards</button>
+            <button id="resetBtn">Reset</button>
+            <!-- New Copy Room Link button -->
+            <button id="copyRoomLinkBtn">Copy Room Link</button>
+        </div>
+    </div>
+</div>
+<!-- Inject the roomId from the server -->
+<script>
+    var roomId = "[[${roomId}]]";
+</script>
+<script src="/js/room.js"></script>
+</body>
+</html>
