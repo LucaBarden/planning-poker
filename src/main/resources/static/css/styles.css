@@ -357,7 +357,6 @@ body.dark-mode .card-back {
 
 .card-face.reveal {
     animation: fadeIn 0.5s forwards;
-+
 }
 
 
