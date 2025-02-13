@@ -38,11 +38,11 @@ This is a **Planning Poker** web application built using **Java Spring Boot 3.4.
 ```
 
 ### Running with Docker
-The application is available on Docker Hub under `duallord/planning-poker:latest`.
+The application is available on Docker Hub under `lucabarden/planning-poker:latest`.
 
 #### Run with Docker CLI
 ```sh
-docker run -p 8080:8080 duallord/planning-poker:latest
+docker run -p 8080:8080 lucabarden/planning-poker:latest
 ```
 
 #### Example Docker Compose File
@@ -50,7 +50,7 @@ docker run -p 8080:8080 duallord/planning-poker:latest
 version: '3.8'
 services:
   planning-poker:
-    image: duallord/planning-poker:latest
+    image: lucabarden/planning-poker:latest
     ports:
       - "8080:8080"
     restart: unless-stopped
