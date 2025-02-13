@@ -43,9 +43,9 @@ function updateRoom(data) {
         cardArea.style.display = 'block';
         // Provide a tooltip message for feedback.
         if (!allPlayed) {
-            revealBtn.title = "Waiting for all players to play their card.";
+            revealBtn.title = "Warten, dass alle Spieler ihre Karte legen";
         } else if (data.revealed) {
-            revealBtn.title = "Cards have already been revealed for this round.";
+            revealBtn.title = "Die Karten wurden diese Runde bereits aufgedeckt";
         }
     }
 
@@ -69,10 +69,18 @@ function updateRoom(data) {
         } else {
             // Cards are not yet revealed.
             if (player.card && player.card.trim() !== "") {
-                // Player has played a card: show a face-down card.
-                let cardBack = document.createElement('div');
-                cardBack.className = "card-back";
-                cardDiv.appendChild(cardBack);
+                if (player.id === playerId) {
+                    // For the current user, show the actual card they've played.
+                    let cardFace = document.createElement('div');
+                    cardFace.className = "card-face";
+                    cardFace.textContent = player.card;
+                    cardDiv.appendChild(cardFace);
+                } else {
+                    // For other players, show a generic face-down card.
+                    let cardBack = document.createElement('div');
+                    cardBack.className = "card-back";
+                    cardDiv.appendChild(cardBack);
+                }
             } else {
                 // Player hasn't played: show a placeholder.
                 let placeholder = document.createElement('div');
@@ -121,7 +129,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('joinBtn').addEventListener('click', function () {
         let userName = document.getElementById('userName').value.trim();
         if (userName === "") {
-            alert("Please enter your name");
+            alert("Bitte gib deinen Namen ein");
             return;
         }
         // Generate a random playerId for this session
@@ -145,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.card').forEach(function(cardElem) {
         cardElem.addEventListener('click', function () {
             if (!joined) {
-                alert("Please join the room first!");
+                alert("Erst dem Raum beitreten");
                 return;
             }
             let cardValue = this.getAttribute('data-value');
@@ -189,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const roomLink = window.location.href;
         navigator.clipboard.writeText(roomLink).then(() => {
         }).catch(err => {
-            alert('Failed to copy room link.');
+            alert('Fehler beim kopieren des Links.');
         });
     });
 });
