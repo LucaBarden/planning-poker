@@ -1,20 +1,23 @@
-name: Build, Publish Docker Image and Executable Jar
+name: Build, Push Docker Image & Release Jar
 
 on:
   workflow_dispatch:
   push:
     branches:
       - main
+      - release-*
 
 jobs:
-  build-and-release:
+  build-docker:
+    name: Builds the new Docker Image
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
+    outputs:
+      project-version: ${{ steps.get_version.outputs.project-version }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Set up Java
         uses: actions/setup-java@v3
@@ -30,15 +33,18 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
+      - name: Make Maven Wrapper Executable
+        run: chmod +x mvnw
+
       - name: Extract Project Version
         id: get_version
         run: |
-          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout)
           echo "Project version: $VERSION"
+          echo "project-version=$VERSION" >> $GITHUB_OUTPUT
+          echo "$GITHUB_OUTPUT"
+          # Also export for later steps in this job
           echo "VERSION=$VERSION" >> $GITHUB_ENV
-
-      - name: Make Maven Wrapper Executable
-        run: chmod +x mvnw
 
       - name: Build Docker Image with Maven
         run: |
@@ -48,24 +54,94 @@ jobs:
         run: |
           docker tag lucabarden/planning-poker:${{ env.VERSION }} lucabarden/planning-poker:latest
 
+      - name: Save Docker Images as Tar Files
+        run: |
+          docker save lucabarden/planning-poker:${{ env.VERSION }} -o planning-poker-${{ env.VERSION }}.tar
+          docker save lucabarden/planning-poker:latest -o planning-poker-latest.tar
+
+      - name: Upload Docker Image Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-images
+          path: |
+            planning-poker-${{ env.VERSION }}.tar
+            planning-poker-latest.tar
+
+  push-docker:
+    name: Pushes the newest Docker image to Docker Hub
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/heads/release-')
+    needs: build-docker
+    steps:
+      - name: Download Docker Image Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-images
+
+      - name: Load Docker Images
+        run: |
+          docker load -i planning-poker-${{ needs.build-docker.outputs.project-version }}.tar
+          docker load -i planning-poker-latest.tar
+
       - name: Log in to Docker Hub
-        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Push Docker Images
+        if: startsWith(github.ref, 'refs/heads/release-')
         run: |
-          docker push lucabarden/planning-poker:${{ env.VERSION }}
+          docker push lucabarden/planning-poker:${{ needs.build-docker.outputs.project-version }}
           docker push lucabarden/planning-poker:latest
+
+  build-and-release-jar:
+    name: Builds the release jar file and prepares the release
+    if: startsWith(github.ref, 'refs/heads/release-')
+    runs-on: ubuntu-latest
+    needs: [build-docker, push-docker]
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Cache Maven Packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Set Version from Build
+        run: echo "VERSION=${{ needs.build-docker.outputs.project-version }}" >> $GITHUB_ENV
+
+      - name: Make Maven Wrapper Executable
+        run: chmod +x mvnw
 
       - name: Build Executable Jar
         run: |
           ./mvnw clean package -DskipTests
 
-      - name: Upload Jar as Release Asset
+      - name: Generate Release Body using ChatGPT
+        id: generate_release_body
+        run: |
+          # Execute the external script and capture its output.
+          RELEASE_BODY=$(bash .github/workflows/generate_release_body.sh)
+          echo "release_body=$RELEASE_BODY" >> $GITHUB_OUTPUT
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Create GitHub Release & Upload Jar
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ github.ref_name }}
-          name: "Release ${{github.ref_name }}"
+          name: "GitHub Release Notes - Version ${{ needs.build-docker.outputs.project-version }}"
           draft: true
+          body: ${{ steps.generate_release_body.outputs.release_body }}
           files: target/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
