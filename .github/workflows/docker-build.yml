@@ -31,14 +31,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      - name: Cache Docker Build Layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache
-          key: docker-${{ runner.os }}-${{ github.sha }}
-          restore-keys: |
-            docker-${{ runner.os }}-
-
       - name: Extract Project Version
         id: get_version
         run: |
