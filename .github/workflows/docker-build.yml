@@ -2,10 +2,9 @@ name: Build, Publish Docker Image and Executable Jar
 
 on:
   push:
-    tags:
-      - 'release*'
-      - 'feature*'
-      - 'hotfix*'
+    branches:
+      - main
+      - release*
 
 jobs:
   build-and-release:
