@@ -36,6 +36,9 @@ jobs:
           echo "Project version: $VERSION"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+      - name: Make Maven Wrapper Executable
+        run: chmod +x mvnw
+
       - name: Build Docker Image with Maven
         run: |
           ./mvnw spring-boot:build-image -Dspring-boot.build-image.imageName=duallord/planning-poker:${{ env.VERSION }}
