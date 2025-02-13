@@ -72,14 +72,20 @@ function updateRoom(data) {
                 if (player.id === playerId) {
                     // For the current user, show the actual card they've played.
                     let cardFace = document.createElement('div');
-                    cardFace.className = "card-face";
+                    cardFace.className = "card-face reveal";
                     cardFace.textContent = player.card;
-                    cardDiv.appendChild(cardFace);
+                    let container = document.createElement('div');
+                    container.className = "card-container";
+                    container.append(cardFace);
+                    cardDiv.appendChild(container);
                 } else {
                     // For other players, show a generic face-down card.
                     let cardBack = document.createElement('div');
-                    cardBack.className = "card-back";
-                    cardDiv.appendChild(cardBack);
+                    cardBack.className = "card-back flip-animation";
+                    let container = document.createElement('div');
+                    container.className = "card-container";
+                    container.appendChild(cardBack);
+                    cardDiv.appendChild(container);
                 }
             } else {
                 // Player hasn't played: show a placeholder.
