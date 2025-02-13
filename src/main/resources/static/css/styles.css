@@ -235,3 +235,41 @@ button:hover {
     border-radius: 8px;
 }
 
+.footbar {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 40px; /* Slim footbar */
+    background: #1e1e1e;
+    color: white;
+    text-align: center;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.github-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: #24292e;
+    border-radius: 50%;
+    transition: background 0.3s;
+}
+
+.github-btn img {
+    width: 16px;
+    height: 16px;
+}
+
+.github-btn:hover {
+    background: #0366d6;
+}
+
+
