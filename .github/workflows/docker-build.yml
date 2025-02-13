@@ -1,0 +1,64 @@
+name: Build, Publish Docker Image and Executable Jar
+
+on:
+  push:
+    tags:
+      - 'release*'
+      - 'feature*'
+      - 'hotfix*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Cache Maven Packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Extract Project Version
+        id: get_version
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Project version: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Build Docker Image with Maven
+        run: |
+          ./mvnw spring-boot:build-image -Dspring-boot.build-image.imageName=duallord/planning-poker:${{ env.VERSION }}
+
+      - name: Tag Image as Latest
+        run: |
+          docker tag duallord/planning-poker:${{ env.VERSION }} duallord/planning-poker:latest
+
+      - name: Log in to Docker Hub
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+
+      - name: Push Docker Images
+        run: |
+          docker push duallord/planning-poker:${{ env.VERSION }}
+          docker push duallord/planning-poker:latest
+
+      - name: Build Executable Jar
+        run: |
+          ./mvnw clean package -DskipTests
+
+      - name: Upload Jar as Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: target/*.jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
