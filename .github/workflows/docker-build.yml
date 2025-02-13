@@ -60,12 +60,24 @@ jobs:
         run: |
           ./mvnw clean package -DskipTests
 
+      - name: Generate Release Body using ChatGPT
+        id: generate_release_body
+        run: |
+          # Execute external script and capture its output
+          RELEASE_BODY=$(bash .github/workflows/generate_release_body.sh)
+          echo "release_body<<EOF" >> $GITHUB_OUTPUT
+          echo "$RELEASE_BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
       - name: Upload Jar as Release Asset
         uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/heads/release-')
         with:
-          tag_name: ${{ github.ref_name }}
-          name: "Release ${{github.ref_name }}"
+          name: "GitHub Release Notes - Version ${{ env.VERSION }}"
           draft: true
+          body: ${{ steps.generate_release_body.outputs.release_body }}
           files: target/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
