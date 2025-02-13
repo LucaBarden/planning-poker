@@ -55,4 +55,11 @@ public class RoomService {
             room.getPlayers().values().forEach(player -> player.setCard(""));
         }
     }
+
+    public void removePlayer(String roomId, String playerId) {
+        Room room = getRoom(roomId);
+        if (room != null) {
+            room.getPlayers().remove(playerId);
+        }
+    }
 }

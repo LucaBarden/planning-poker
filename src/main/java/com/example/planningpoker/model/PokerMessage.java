@@ -9,7 +9,8 @@ public class PokerMessage {
         CARD_PLAYED,
         REVEAL,
         RESET,
-        UPDATE
+        UPDATE,
+        LEAVE
     }
 
     private MessageType type;

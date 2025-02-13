@@ -51,6 +51,8 @@ public class PokerController {
                 // Reset the room (clear cards and hide them)
                 roomService.resetRoom(roomId);
                 break;
+            case LEAVE:
+                roomService.removePlayer(roomId, message.getPlayerId());
             default:
                 break;
         }

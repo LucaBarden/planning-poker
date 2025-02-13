@@ -119,10 +119,25 @@ function updateRoom(data) {
     });
 }
 
-
-
 function sendMessage(message) {
     stompClient.send("/app/room", {}, JSON.stringify(message));
+}
+
+function leaveRoom() {
+    if (!joined) return;
+
+    let leaveMsg = {
+        type: "LEAVE",
+        roomId: roomId,
+        playerId: playerId
+    };
+    sendMessage(leaveMsg);
+
+    if (stompClient !== null) {
+        stompClient.disconnect(() => {
+            console.log("Disconnected from room.");
+        });
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -199,5 +214,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }).catch(err => {
             alert('Fehler beim kopieren des Links.');
         });
+    });
+
+    // Leave the room by clicking on the leave room button
+    document.getElementById('leaveRoomBtn').addEventListener('click', function() {
+        leaveRoom();
+        window.location.href = "/";
+    });
+
+    // Leave the room upon closing the browser tab or window
+    window.addEventListener("beforeunload", function(event) {
+        leaveRoom();
     });
 });

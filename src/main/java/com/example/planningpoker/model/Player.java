@@ -1,8 +1,13 @@
 package com.example.planningpoker.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Player {
+    @JsonProperty("id")
     private String id;
+    @JsonProperty("name")
     private String name;
+    @JsonProperty("card")
     private String card;
 
     public Player() { }
