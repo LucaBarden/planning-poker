@@ -14,8 +14,8 @@ fi
 echo "Commit messages since last release:" >&2
 echo "$CHANGES" >&2
 
-# Prepare the prompt for ChatGPT.
-PROMPT="Generate release notes in Markdown format that include:
+# Prepare the user prompt without role markers (roles are defined in the messages array)
+USER_PROMPT="Generate release notes in Markdown format that include:
 🔥 **What's New?** – Summarize the new features and improvements.
 🚀 **Upcoming Features** – Mention any features on the horizon.
 💡 **Get Involved!** – Encourage community participation.
@@ -23,25 +23,39 @@ Use the following commit messages as context:
 $CHANGES
 "
 
-echo "Prompt for ChatGPT:" >&2
-echo "$PROMPT" >&2
+echo "User Prompt:" >&2
+echo "$USER_PROMPT" >&2
 
-# Call the OpenAI API (using the gpt-4o-mini model)
-RESPONSE=$(curl -s -X POST https://api.openai.com/v1/chat/completions \
+# Build the JSON payload using jq with the new messages API structure
+DATA=$(jq -n --arg user_message "$USER_PROMPT" '{
+  messages: [
+    {role: "user", content: $user_message}
+  ],
+  model: "claude-3-5-sonnet-20241022",
+  system: "You are a release note generator.",
+  max_tokens: 2048
+}')
+
+echo "JSON Payload:" >&2
+echo "$DATA" >&2
+
+# Call the Anthropic API.
+RESPONSE=$(curl -s -X POST https://api.anthropic.com/v1/messages \
   -H "Content-Type: application/json" \
-  -H "Authorization: Bearer ${OPENAI_API_KEY}" \
-  -d "{
-        \"model\": \"gpt-4o-mini\",
-        \"messages\": [
-          {\"role\": \"system\", \"content\": \"You are a release note generator.\"},
-          {\"role\": \"user\", \"content\": \"$PROMPT\"}
-        ]
-      }")
+  -H "anthropic-version: 2023-06-01" \
+  -H "x-api-key: ${ANTHROPIC_API_KEY}" \
+  -d "$DATA")
 
-# Extract the release notes using jq.
-RELEASE_BODY=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
+echo "Full API Response:" >&2
+echo "$RESPONSE" | jq . >&2
+
+# Extract the generated release notes from the "completion" field.
+RELEASE_BODY=$(echo "$RESPONSE" | jq -r '.content[0].text')
+
+if [ "$RELEASE_BODY" = "null" ] || [ -z "$RELEASE_BODY" ]; then
+  echo "Error: Release body not generated. Please check the API response above." >&2
+fi
+
 echo "Generated Release Body:" >&2
 echo "$RELEASE_BODY" >&2
 
-# Output the release body to stdout.
-echo "$RELEASE_BODY"
