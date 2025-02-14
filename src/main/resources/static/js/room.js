@@ -69,17 +69,23 @@ function updateRoom(data) {
         }
 
         if (data.revealed) {
+            // Hide card selection area when revealed
+            cardArea.style.display = 'none';
             // When cards are revealed, display the card face for everyone with a flip animation if new.
             let cardFace = document.createElement('div');
             if (player.id === playerId) {
                 cardFace.className = "card-face"
-            } else {
-                cardFace.className = "card-face flip-animation";
-            }
-            cardFace.textContent = player.card;
-
-            cardFace.addEventListener("animationiteration", function () {
                 cardFace.textContent = player.card;
+            } else {
+                cardFace.className = "card-back flip-animation";
+            }
+
+            cardFace.addEventListener("animationstart", function () {
+                setTimeout(() => {
+                    cardFace.classList.remove("card-back");
+                    cardFace.classList.add("card-face");
+                    cardFace.textContent = player.card;
+                }, (parseFloat(getComputedStyle(cardFace).animationDuration) * 500))
             });
 
             cardFace.addEventListener("animationend", function () {
@@ -88,8 +94,7 @@ function updateRoom(data) {
 
             container.appendChild(cardFace);
             lastCards[player.id] = player.card;
-            // Hide card selection area when revealed
-            cardArea.style.display = 'none';
+
         } else {
             // Unrevealed state: show placeholder if no card has been played.
             if (player.card && player.card.trim() !== "") {
