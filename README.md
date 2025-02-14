@@ -25,6 +25,20 @@ This is a **Planning Poker** web application built using **Java Spring Boot 3.4.
 - **Java 17+** (Ensure you have JDK 17 or higher installed)
 - **Maven** (Used for building the project)
 
+### Running the Release JAR Locally
+
+After building the project, you can run the generated JAR file using the following command:
+```sh
+java -jar target/planning-poker.jar
+```
+
+Ensure that you have Java installed on your system. If you need to specify a different port, you can run:
+
+```sh
+java -jar target/planning-poker.jar --server.port=8081
+```
+This will start the application on port 8081 instead of the default.
+
 ### Clone the Repository
 ```sh
  git clone https://github.com/your-username/planning-poker.git
