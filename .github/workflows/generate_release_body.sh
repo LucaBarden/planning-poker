@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # Find the last tag; if none exists, use all commits.
 LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
@@ -57,5 +56,5 @@ if [ "$RELEASE_BODY" = "null" ] || [ -z "$RELEASE_BODY" ]; then
 fi
 
 echo "Generated Release Body:" >&2
-echo "$RELEASE_BODY" >&2
+echo "$RELEASE_BODY"
 

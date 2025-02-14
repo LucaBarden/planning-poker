@@ -134,18 +134,27 @@ jobs:
       - name: Generate Release Body using ChatGPT
         id: generate_release_body
         run: |
-          # Execute the external script and capture its output.
+          # Capture output from the script correctly
           RELEASE_BODY=$(bash .github/workflows/generate_release_body.sh)
-          echo "release_body=$RELEASE_BODY" >> $GITHUB_OUTPUT
+
+          # Ensure multi-line output is preserved
+          {
+              echo "RELEASE_BODY<<EOF"
+              echo "$RELEASE_BODY"
+              echo "EOF"
+          } >> "$GITHUB_ENV"
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Debug Release Body from Env
+        run: echo "${{ env.RELEASE_BODY }}"
 
       - name: Create GitHub Release & Upload Jar
         uses: softprops/action-gh-release@v1
         with:
           name: "GitHub Release Notes - Version ${{ needs.build-docker.outputs.project-version }}"
           draft: true
-          body: ${{ steps.generate_release_body.outputs.release_body }}
+          body: ${{ env.RELEASE_BODY }}
           files: target/*.jar
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
