@@ -68,7 +68,7 @@ input[type="text"] {
     margin: 10px;
 }
 
-button {
+.normalBtn {
     padding: 10px 20px;
     background-color: #2196F3;
     border: none;
@@ -79,7 +79,22 @@ button {
     transition: background-color 0.3s ease;
 }
 
-button:hover {
+.revealBtn {
+    padding: 10px 20px;
+    background-color: #2196F3;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    margin: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.revealBtn:hover {
+    background-color: #0b7dda;
+}
+
+.normalBtn:hover {
     background-color: #0b7dda;
 }
 
@@ -259,25 +274,7 @@ body.dark-mode .card-back {
     margin-top: 20px;
 }
 
-#controls button {
-    padding: 10px 20px;
-    margin: 5px;
-    background-color: #2196F3;
-    border: none;
-    border-radius: 4px;
-    color: #fff;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
 
-#controls button:hover {
-    background-color: #0b7dda;
-}
-
-
-/* (Optional) If you want the status bar to be on the side, you can adjust its position.
-   For example, to position it fixed to the right:
-*/
 .status-bar {
     position: fixed;
     right: 10px;
@@ -379,3 +376,51 @@ body.dark-mode .card-back {
     animation: cardThrow 0.8s ease-out forwards;
 }
 
+.leaveRoomBtn {
+    background-color: #ff1447;
+    color: white;
+    position: fixed;
+    bottom: 60px;
+    left: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in;
+}
+
+.leaveRoomBtn:hover {
+    background-color: #fd365c;
+}
+
+.copyRoomLinkBtn {
+    position: fixed;
+    bottom: 60px;
+    right: 10px;
+    padding: 10px 20px;
+    border: none;
+    background-color: #2196F3;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease
+}
+
+.copyRoomLinkBtn:hover {
+    background-color: #0b7dda;
+}
+
+.resetBtn {
+    padding: 10px 20px;
+    background-color: #2196F3;
+    border: none;
+    border-radius: 4px;
+    color: #fff;
+    cursor: pointer;
+    margin: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.resetBtn:hover {
+    background-color: #0b7dda;
+}
