@@ -52,7 +52,15 @@ public class RoomService {
         Room room = getRoom(roomId);
         if (room != null) {
             room.setRevealed(false);
+            room.setReset(true);
             room.getPlayers().values().forEach(player -> player.setCard(""));
+        }
+    }
+
+    public void startRoom(String roomId) {
+        Room room = getRoom(roomId);
+        if (room != null) {
+            room.setReset(false);
         }
     }
 
