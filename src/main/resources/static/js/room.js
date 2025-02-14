@@ -2,6 +2,7 @@
 let stompClient = null;
 let playerId = null;
 let joined = false;
+let lastCards = {}
 
 function connect(callback) {
     let socket = new SockJS('/ws');
@@ -24,24 +25,23 @@ function updateRoom(data) {
     playersList.innerHTML = "";
 
     // Check whether every player in the room has played a card.
-    // (Assumes that an empty string means "not played.")
     let allPlayed = data.players.length > 0 && data.players.every(function(player) {
         return player.card && player.card.trim() !== "";
     });
 
-    // Get the Reveal Cards button.
+    if (data.reset) {
+        lastCards = {}
+    }
+
+    // Get the Reveal Cards button and card area.
     let revealBtn = document.getElementById('revealBtn');
     let cardArea = document.getElementById('cardChoices');
-    // Enable the reveal button only if:
-    // 1. All players have played a card, AND
-    // 2. The cards have not already been revealed.
     if (allPlayed && !data.revealed) {
         revealBtn.disabled = false;
         revealBtn.title = "";
     } else {
         revealBtn.disabled = true;
         cardArea.style.display = 'block';
-        // Provide a tooltip message for feedback.
         if (!allPlayed) {
             revealBtn.title = "Warten, dass alle Spieler ihre Karte legen";
         } else if (data.revealed) {
@@ -49,67 +49,104 @@ function updateRoom(data) {
         }
     }
 
-    // Update the players list.
+    // Process each player's state
     data.players.forEach(function(player) {
-        // Create a container for this player.
         let li = document.createElement('li');
         li.className = "player";
 
-        // Create the card display container.
         let cardDiv = document.createElement('div');
         cardDiv.className = "card-display";
+        let container = document.createElement('div');
+        container.className = "card-container";
+        cardDiv.appendChild(container);
 
-        if (data.revealed) {
-            // If cards are revealed, show the card face with value.
-            let cardFace = document.createElement('div');
-            cardArea.style.display = 'none';
-            cardFace.className = "card-face flip";
-            cardFace.textContent = player.card;
-            cardDiv.appendChild(cardFace);
-        } else {
-            // Cards are not yet revealed.
-            if (player.card && player.card.trim() !== "") {
-                if (player.id === playerId) {
-                    // For the current user, show the actual card they've played.
-                    let cardFace = document.createElement('div');
-                    cardFace.className = "card-face";
-                    cardFace.textContent = player.card;
-                    cardDiv.appendChild(cardFace);
-                } else {
-                    // For other players, show a generic face-down card.
-                    let cardBack = document.createElement('div');
-                    cardBack.className = "card-back";
-                    cardDiv.appendChild(cardBack);
-                }
-            } else {
-                // Player hasn't played: show a placeholder.
-                let placeholder = document.createElement('div');
-                placeholder.className = "card-placeholder";
-                cardDiv.appendChild(placeholder);
+        // Determine if this player's card is new (i.e. not already animated)
+        let isNewCard = false;
+        if (player.card && player.card.trim() !== "") {
+            if (!lastCards[player.id] || lastCards[player.id] !== player.card) {
+                isNewCard = true;
             }
         }
 
-        // Create a status container element that always shows the player's name with the status icon.
+        if (data.revealed) {
+            // Hide card selection area when revealed
+            cardArea.style.display = 'none';
+            // When cards are revealed, display the card face for everyone with a flip animation if new.
+            let cardFace = document.createElement('div');
+            if (player.id === playerId) {
+                cardFace.className = "card-face"
+                cardFace.textContent = player.card;
+            } else {
+                cardFace.className = "card-back flip-animation";
+            }
+
+            cardFace.addEventListener("animationstart", function () {
+                setTimeout(() => {
+                    cardFace.classList.remove("card-back");
+                    cardFace.classList.add("card-face");
+                    cardFace.textContent = player.card;
+                }, (parseFloat(getComputedStyle(cardFace).animationDuration) * 500))
+            });
+
+            cardFace.addEventListener("animationend", function () {
+                cardFace.classList.remove("flip-animation");
+            }, {once: true});
+
+            container.appendChild(cardFace);
+            lastCards[player.id] = player.card;
+
+        } else {
+            // Unrevealed state: show placeholder if no card has been played.
+            if (player.card && player.card.trim() !== "") {
+                if (player.id === playerId) {
+                    // For current user: show the actual card (face) with a throw animation if it's new.
+                    let cardFace = document.createElement('div');
+                    if (isNewCard) {
+                        cardFace.className = "card-face card-throw";
+                        cardFace.addEventListener("animationend", function () {
+                            cardFace.classList.remove("card-throw");
+                        }, {once: true});
+                    } else {
+                        cardFace.className = "card-face";
+                    }
+                    cardFace.textContent = player.card;
+                    container.appendChild(cardFace);
+                    lastCards[player.id] = player.card;
+                } else {
+                    // For other players: show a generic face-down card (card-back).
+                    let cardBack = document.createElement('div');
+                    // If it's a new play for them, animate the card-back as if thrown in.
+                    if (isNewCard) {
+                        cardBack.className = "card-back card-throw";
+                        cardBack.addEventListener("animationend", function () {
+                            cardBack.classList.remove("card-throw");
+                        });
+                    } else {
+                        cardBack.className = "card-back";
+                    }
+                    container.appendChild(cardBack);
+                    lastCards[player.id] = player.card;
+                }
+            } else {
+                // No card played: show a placeholder.
+                let placeholder = document.createElement('div');
+                placeholder.className = "card-placeholder";
+                container.appendChild(placeholder);
+            }
+        }
+
+        // Create status container for the player's name and icon.
         let statusContainer = document.createElement('div');
         statusContainer.className = "player-status-container";
 
-        // Create a status icon element.
         let statusDiv = document.createElement('div');
         statusDiv.className = "player-status";
-        if (player.card && player.card.trim() !== "") {
-            // Check mark for played.
-            statusDiv.innerHTML = "&#9989;"; // ✅
-        } else {
-            // Cross mark for not played.
-            statusDiv.innerHTML = "&#10060;"; // ❌
-        }
+        statusDiv.innerHTML = (player.card && player.card.trim() !== "") ? "&#9989;" : "&#10060;";
 
-        // Create a label for the player's name.
         let nameLabel = document.createElement('span');
         nameLabel.className = "player-name";
         nameLabel.textContent = player.name;
 
-        // Append the status icon and the player's name.
         statusContainer.appendChild(statusDiv);
         statusContainer.appendChild(nameLabel);
 
@@ -118,6 +155,7 @@ function updateRoom(data) {
         playersList.appendChild(li);
     });
 }
+
 
 function sendMessage(message) {
     stompClient.send("/app/room", {}, JSON.stringify(message));

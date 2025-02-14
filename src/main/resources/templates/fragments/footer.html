@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Fragments</title>
+</head>
+<body>
+<div th:fragment="footer">
+    <script src="/js/footer.js" defer></script>
+    <footer class="footbar">
+        <span>Created by Luca Barden</span>
+        <a href="https://github.com/LucaBarden/planning-poker" target="_blank" class="github-btn"
+           title="View on GitHub">
+            <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo">
+        </a>
+        <button id="darkModeToggle" class="dark-mode-toggle">Dark Mode</button>
+    </footer>
+</div>
+</body>
+</html>

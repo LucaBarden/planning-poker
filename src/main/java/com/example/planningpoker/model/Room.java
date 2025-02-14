@@ -1,14 +1,22 @@
 package com.example.planningpoker.model;
 
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@Setter
+@Getter
+@Data
 public class Room {
     private String id;
     private String name;
     private Map<String, Player> players = new ConcurrentHashMap<>();
     private boolean revealed;
+    private boolean reset;
 
     public Room() { }
 
@@ -16,32 +24,6 @@ public class Room {
         this.id = id;
         this.name = name;
         this.revealed = false;
-    }
-
-    // Getters and setters
-    public String getId() {
-        return id;
-    }
-    public void setId(String id) {
-        this.id = id;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public Map<String, Player> getPlayers() {
-        return players;
-    }
-    public void setPlayers(Map<String, Player> players) {
-        this.players = players;
-    }
-    public boolean isRevealed() {
-        return revealed;
-    }
-    public void setRevealed(boolean revealed) {
-        this.revealed = revealed;
     }
 
     // Convenience method to get a list of players

@@ -63,8 +63,11 @@ public class PokerController {
         updateMessage.setRoomId(roomId);
         updateMessage.setPlayers(room.getPlayerList());
         updateMessage.setRevealed(room.isRevealed());
+        updateMessage.setReset(room.isReset());
+        roomService.startRoom(roomId);
 
         // Broadcast the update only to the clients in this room
         messagingTemplate.convertAndSend("/topic/room/" + roomId, updateMessage);
+
     }
 }
