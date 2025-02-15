@@ -1,7 +1,7 @@
-package com.example.planningpoker.service;
+package de.lbarden.planningpoker.service;
 
-import com.example.planningpoker.model.Player;
-import com.example.planningpoker.model.Room;
+import de.lbarden.planningpoker.model.Player;
+import de.lbarden.planningpoker.model.Room;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;

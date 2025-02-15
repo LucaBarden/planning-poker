@@ -1,13 +1,13 @@
-package com.example.planningpoker;
+package de.lbarden.planningpoker;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class PlanningpokerApplication {
+public class PlanningPokerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(PlanningpokerApplication.class, args);
+        SpringApplication.run(PlanningPokerApplication.class, args);
     }
 
 }
