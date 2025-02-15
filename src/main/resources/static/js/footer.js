@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("Dark Mode script loaded!");
+    document.body.classList.remove("no-transition");
 
     const toggleButton = document.getElementById("darkModeToggle");
 

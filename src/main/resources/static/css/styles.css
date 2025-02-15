@@ -7,6 +7,11 @@ body {
     color: #000000;
     margin: 0;
     padding: 0;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+body.no-transition, body.no-transition * {
+    transition: none !important;
 }
 
 #gameArea {
@@ -74,6 +79,7 @@ body.dark-mode .card {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 h1, h2 {
@@ -153,7 +159,7 @@ input[type="text"] {
     line-height: 120px;
     image-rendering: pixelated;
     box-shadow: 4px 4px 0 #000;
-    transition: transform 0.2s ease-in-out;
+    transition: transform 0.2s ease-in-out, background-color 0.5s ease, color 0.5s ease, border 0.5s ease;
 }
 
 
@@ -234,6 +240,7 @@ input[type="text"] {
     line-height: 120px;
     image-rendering: pixelated;
     box-shadow: 4px 4px 0 #000;
+    transition: background-color 0.5s ease, color 0.5s, border 0.5s;
 }
 
 /* Default Light Mode Card Face and Back */
@@ -252,22 +259,29 @@ input[type="text"] {
 .card-placeholder {
     background-color: #ccc;
     border: 2px dashed #999;
+    transition: background-color 0.5s ease, color 0.5s ease, border 0.5s ease;
 }
 
 /* Dark Mode for Card Face */
 body.dark-mode .card-face {
     background-color: #2a2a2a; /* Dark background */
     color: #ffffff; /* White text */
+    margin: 10px;
+    height: 120px;
     border: 2px solid #555; /* Darker border */
 }
 
 body.dark-mode .card-face.flip {
     background-color: #2a2a2a; /* Slightly lighter dark mode flip */
+    margin: 10px;
+    height: 120px;
     color: #ffffff;
 }
 
 body.dark-mode .card-back {
     background-color: #2a2a2a; /* Dark background */
+    margin: 10px;
+    height: 120px;
     border: 2px solid #555; /* Darker border */
 }
 
