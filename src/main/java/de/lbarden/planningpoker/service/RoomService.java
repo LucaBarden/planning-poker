@@ -2,8 +2,10 @@ package de.lbarden.planningpoker.service;
 
 import de.lbarden.planningpoker.model.Player;
 import de.lbarden.planningpoker.model.Room;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,6 +30,7 @@ public class RoomService {
         Room room = getRoom(roomId);
         if (room != null) {
             room.getPlayers().put(player.getId(), player);
+            room.updateLastActivity();
         }
     }
 
@@ -37,6 +40,7 @@ public class RoomService {
             Player player = room.getPlayers().get(playerId);
             if (player != null) {
                 player.setCard(card);
+                room.updateLastActivity();
             }
         }
     }
@@ -45,6 +49,7 @@ public class RoomService {
         Room room = getRoom(roomId);
         if (room != null) {
             room.setRevealed(true);
+            room.updateLastActivity();
         }
     }
 
@@ -54,6 +59,7 @@ public class RoomService {
             room.setRevealed(false);
             room.setReset(true);
             room.getPlayers().values().forEach(player -> player.setCard(""));
+            room.updateLastActivity();
         }
     }
 
@@ -61,6 +67,7 @@ public class RoomService {
         Room room = getRoom(roomId);
         if (room != null) {
             room.setReset(false);
+            room.updateLastActivity();
         }
     }
 
@@ -68,6 +75,23 @@ public class RoomService {
         Room room = getRoom(roomId);
         if (room != null) {
             room.getPlayers().remove(playerId);
+            room.updateLastActivity();
+        }
+    }
+
+    // Scheduled task: every minute check and remove rooms inactive for 60 minutes
+    @Scheduled(fixedRate = 60000)
+    public void removeStaleRoom() {
+        long now = System.currentTimeMillis();
+        long staleThreshold = 60 * 60 * 1000;
+        Iterator<Map.Entry<String, Room>> iterator = rooms.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, Room> entry = iterator.next();
+            Room room = entry.getValue();
+            if (now - room.getLastActivity() > staleThreshold) {
+                iterator.remove();
+                System.out.println("Removed stale room: " + room.getId());
+            }
         }
     }
 }

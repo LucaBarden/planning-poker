@@ -17,6 +17,8 @@ public class Room {
     private Map<String, Player> players = new ConcurrentHashMap<>();
     private boolean revealed;
     private boolean reset;
+    private long lastActivity;
+
 
     public Room() { }
 
@@ -24,6 +26,11 @@ public class Room {
         this.id = id;
         this.name = name;
         this.revealed = false;
+        updateLastActivity();
+    }
+
+    public void updateLastActivity() {
+        this.lastActivity = System.currentTimeMillis();
     }
 
     // Convenience method to get a list of players
