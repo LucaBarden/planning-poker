@@ -2,6 +2,7 @@ package de.lbarden.planningpoker.service;
 
 import de.lbarden.planningpoker.model.Player;
 import de.lbarden.planningpoker.model.Room;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +10,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class RoomServiceTest {
 
-    private final RoomService roomService = new RoomService();
+    private RoomService roomService;
+
+    @BeforeEach
+    void setUp() {
+        roomService = new RoomService();
+    }
 
     @Test
     @DisplayName("Room Service correctly creates a room")
@@ -65,5 +71,25 @@ public class RoomServiceTest {
         Room fetchedRoom = roomService.getRoom(room.getId());
         assertFalse(fetchedRoom.isRevealed());
         assertEquals("", fetchedRoom.getPlayers().get("player-1").getCard());
+    }
+
+    @Test
+    void testStartRoom() {
+        Room room = roomService.createRoom("Test Room");
+        // Assume startRoom sets a flag in the Room (e.g., room.setStarted(true))
+        roomService.startRoom(room.getId());
+        Room updatedRoom = roomService.getRoom(room.getId());
+        assertFalse(updatedRoom.isReset(), "Room should be not reset after startRoom is called");
+    }
+
+    @Test
+    void testRemovePlayer() {
+        Room room = roomService.createRoom("Test Room");
+        Player player = new Player("player-1", "Alice");
+        roomService.addPlayer(room.getId(), player);
+        assertTrue(room.getPlayers().containsKey("player-1"), "Player should exist in room");
+
+        roomService.removePlayer(room.getId(), "player-1");
+        assertFalse(room.getPlayers().containsKey("player-1"), "Player should be removed from room");
     }
 }

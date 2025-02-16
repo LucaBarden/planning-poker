@@ -1,6 +1,7 @@
 package de.lbarden.planningpoker.controller;
 
 
+import de.lbarden.planningpoker.model.Room;
 import de.lbarden.planningpoker.service.RoomService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(HomeController.class)
@@ -31,11 +33,36 @@ public class HomeControllerTest {
     }
 
     @Test
-    @DisplayName("Room Creation correctly redirects")
-    public void testRoomPageRedirectIfRoomNotFound() throws Exception {
+    void testRoomRoute_ModelAttributesPresent() throws Exception {
+        // Assume a Room constructor: new Room(String id, String name)
+        Room room = new Room("room-123", "Test Room");
+        when(roomService.getRoom("room-123")).thenReturn(room);
+
+        mockMvc.perform(get("/room/room-123"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("room"))
+                .andExpect(model().attribute("roomId", "room-123"))
+                .andExpect(model().attribute("roomName", "Test Room"));
+    }
+
+    @Test
+    void testRoomRoute_RedirectIfRoomNotFound() throws Exception {
         when(roomService.getRoom("nonexistent")).thenReturn(null);
 
         mockMvc.perform(get("/room/nonexistent"))
-                .andExpect(status().is3xxRedirection());
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/"));
+    }
+
+    @Test
+    void testCreateRoomRoute() throws Exception {
+        // Simulate room creation via POST /createRoom with parameter roomName=New Room
+        Room room = new Room("room-456", "New Room");
+        when(roomService.createRoom("New Room")).thenReturn(room);
+
+        mockMvc.perform(post("/createRoom")
+                        .param("roomName", "New Room"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/room/room-456"));
     }
 }
