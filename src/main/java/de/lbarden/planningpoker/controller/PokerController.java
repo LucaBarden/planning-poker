@@ -1,10 +1,10 @@
-package com.example.planningpoker.controller;
+package de.lbarden.planningpoker.controller;
 
-import com.example.planningpoker.model.PokerMessage;
-import com.example.planningpoker.model.PokerMessage.MessageType;
-import com.example.planningpoker.model.Player;
-import com.example.planningpoker.model.Room;
-import com.example.planningpoker.service.RoomService;
+import de.lbarden.planningpoker.model.PokerMessage;
+import de.lbarden.planningpoker.model.PokerMessage.MessageType;
+import de.lbarden.planningpoker.model.Player;
+import de.lbarden.planningpoker.model.Room;
+import de.lbarden.planningpoker.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;

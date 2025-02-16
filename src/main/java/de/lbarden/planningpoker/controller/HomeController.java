@@ -1,7 +1,7 @@
-package com.example.planningpoker.controller;
+package de.lbarden.planningpoker.controller;
 
-import com.example.planningpoker.model.Room;
-import com.example.planningpoker.service.RoomService;
+import de.lbarden.planningpoker.model.Room;
+import de.lbarden.planningpoker.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -1,4 +1,4 @@
-package com.example.planningpoker.model;
+package de.lbarden.planningpoker.model;
 
 import lombok.Data;
 import lombok.Getter;

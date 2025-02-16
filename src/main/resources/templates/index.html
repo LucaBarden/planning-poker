@@ -3,6 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <title>Planning Poker - Home</title>
+    <script>
+        (function () {
+            if (localStorage.getItem("darkMode") === "true") {
+                document.documentElement.classList.add("dark-mode", "no-transition");
+            }
+        })();
+    </script>
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
 </head>
 <body>
