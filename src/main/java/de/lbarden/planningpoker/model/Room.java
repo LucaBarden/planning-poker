@@ -1,15 +1,11 @@
 package de.lbarden.planningpoker.model;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Setter
-@Getter
 @Data
 public class Room {
     private String id;
@@ -18,7 +14,10 @@ public class Room {
     private boolean revealed;
     private boolean reset;
     private long lastActivity;
-
+    
+    // Cache for player list to avoid creating new collection on each call
+    private volatile Collection<Player> cachedPlayerList;
+    private volatile int playerModificationCount = 0;
 
     public Room() { }
 
@@ -33,8 +32,36 @@ public class Room {
         this.lastActivity = System.currentTimeMillis();
     }
 
-    // Convenience method to get a list of players
+    // Synchronizing only when modifying players to ensure thread safety
+    public synchronized void addPlayer(String playerId, Player player) {
+        players.put(playerId, player);
+        playerModificationCount++;
+        // Invalidate cache
+        cachedPlayerList = null;
+    }
+    
+    public synchronized Player removePlayer(String playerId) {
+        Player removed = players.remove(playerId);
+        if (removed != null) {
+            playerModificationCount++;
+            // Invalidate cache
+            cachedPlayerList = null;
+        }
+        return removed;
+    }
+
+    // Thread-safe optimized getter that uses cache
     public Collection<Player> getPlayerList() {
-        return players.values();
+        Collection<Player> current = cachedPlayerList;
+        if (current == null) {
+            synchronized (this) {
+                if (cachedPlayerList == null) {
+                    // Create unmodifiable view to prevent external modification
+                    cachedPlayerList = Collections.unmodifiableCollection(players.values());
+                }
+                current = cachedPlayerList;
+            }
+        }
+        return current;
     }
 }
