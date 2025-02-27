@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class RoomService {
     private static final Logger logger = LoggerFactory.getLogger(RoomService.class);
-    private static final int MAX_ROOMS = 1000; // Prevent unbounded growth
+    private static int MAX_ROOMS = 1000; // Prevent unbounded growth
     private static final long STALE_THRESHOLD_MS = TimeUnit.MINUTES.toMillis(60);
 
     // Initial capacity and load factor to avoid frequent resizing
@@ -45,8 +45,13 @@ public class RoomService {
     }
 
     public Room getRoom(String roomId) {
+
+        if (roomId == null) {
+            return null;
+        }
+
         // Check cache first
-        if (roomId != null && roomId.equals(lastAccessedRoomId) && lastAccessedRoom != null) {
+        if (roomId.equals(lastAccessedRoomId) && lastAccessedRoom != null) {
             return lastAccessedRoom;
         }
         
