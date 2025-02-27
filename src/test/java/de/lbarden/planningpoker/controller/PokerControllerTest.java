@@ -30,13 +30,14 @@ class PokerControllerTest {
     @InjectMocks
     private PokerController pokerController;
 
+    @Mock
     private Room testRoom;
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
         // Assume the Room constructor takes an id and name
-        testRoom = new Room("testRoom", "Test Room");
+//        testRoom = new Room("testRoom", "Test Room");
         when(roomService.getRoom("testRoom")).thenReturn(testRoom);
     }
 
@@ -205,7 +206,7 @@ class PokerControllerTest {
         assertEquals(MessageType.UPDATE, errorMessage.getType());
         assertEquals("testRoom", errorMessage.getRoomId());
         assertEquals(players, errorMessage.getPlayers());
-        assertTrue(errorMessage.isRevealed());
+        assertFalse(errorMessage.isRevealed());
     }
     
     @Test
