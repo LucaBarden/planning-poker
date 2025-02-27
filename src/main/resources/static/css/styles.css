@@ -49,6 +49,17 @@
     }
 }
 
+@keyframes fadeInPlayer {
+    0% {
+        opacity: 0;
+        transform: translateY(20px)
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0)
+    }
+}
+
 body {
     font-family: Arial, sans-serif;
     flex-direction: column;
@@ -70,7 +81,9 @@ body.no-transition, body.no-transition * {
     padding: 25px;
     border-radius: 10px;
     box-shadow: 0 4px 6px #0000001a;
-    margin-top: 20px
+    margin-top: 20px;
+    position: relative;
+    padding-bottom: 80px /* Add padding at bottom to prevent overlap */
 }
 
 h2 {
@@ -181,13 +194,17 @@ input[type=text] {
     height: 120px;
     border: 4px solid #000;
     font-family: "Press Start 2P", monospace;
-    font-size: 20px;
+    font-size: 22px;
+    font-weight: 700;
     margin: 10px;
     text-align: center;
     line-height: 120px;
     image-rendering: pixelated;
     box-shadow: 4px 4px 0 #000;
-    transition: transform .2s ease-in-out, background-color .5s ease, color .5s ease, border .5s ease
+    transition: transform .2s ease-in-out, background-color .5s ease, color .5s ease, border .5s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center
 }
 
 .card:hover {
@@ -198,39 +215,81 @@ input[type=text] {
     animation: flip .5s
 }
 
+/* Players grid layout */
 #playersList {
-    text-align: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 15px;
     list-style-type: none;
-    padding: 0
+    padding: 20px 0;
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: center; /* Center the grid items */
+    transition: all 0.5s ease; /* Smooth transition when layout changes */
 }
 
 #playersList li {
-    padding: 8px;
-    border-bottom: 1px solid #ccc
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #ffffff;
+    transition: background-color .5s ease;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    height: 220px;
+    box-sizing: border-box;
+    width: 100%
 }
 
-.card-display, .player {
-    display: flex;
-    align-items: center
+/* Animation class only applied to new players */
+#playersList li.new-player {
+    animation: fadeInPlayer .6s ease-in-out forwards;
+    opacity: 0;
+    transform: translateY(20px)
+}
+
+body.dark-mode #playersList li {
+    background-color: #2a2a2a;
+    border-color: #444
 }
 
 .player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: space-between;
-    margin-bottom: 10px
+    width: 100%;
+    height: 100%
 }
 
 .card-display {
-    flex-direction: column
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 150px;
+    width: 100%;
+    position: relative
 }
 
 .card-container {
-    perspective: 1000px
+    perspective: 1000px;
+    width: 80px;
+    height: 120px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center
 }
 
 .card-back, .card-placeholder {
     width: 80px;
     height: 120px;
-    margin: 10px
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center
 }
 
 .card-placeholder {
@@ -244,10 +303,12 @@ input[type=text] {
 .card-back {
     border: 4px solid #000;
     font-family: "Press Start 2P", monospace;
-    font-size: 20px;
+    font-size: 22px;
+    font-weight: 700;
     color: #fff;
-    text-align: center;
-    line-height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     image-rendering: pixelated;
     box-shadow: 4px 4px 0 #000;
     transition: background-color .5s ease, color .5s, border .5s
@@ -259,7 +320,20 @@ input[type=text] {
 
 .card-face {
     background-color: #fff;
-    color: #000
+    color: #000;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border: 4px solid #000;
+    font-family: "Press Start 2P", monospace;
+    font-size: 22px;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    image-rendering: pixelated;
+    box-shadow: 4px 4px 0 #000;
+    margin: 0
 }
 
 .card-back {
@@ -278,23 +352,23 @@ body.dark-mode .card-face {
 
 body.dark-mode .card-face.flip {
     background-color: #2a2a2a;
-    margin: 10px;
-    height: 120px;
     color: #fff
 }
 
 body.dark-mode .card-back, body.dark-mode .card-face {
     background-color: #2a2a2a;
-    margin: 10px;
-    height: 120px;
     border: 2px solid #555
 }
 
 .player-status-container {
     display: flex;
+    flex-direction: column;
     align-items: center;
     gap: 5px;
-    font-size: 18px
+    font-size: 18px;
+    margin-top: 5px;
+    text-align: center;
+    width: 100%
 }
 
 .player-status {
@@ -302,7 +376,11 @@ body.dark-mode .card-back, body.dark-mode .card-face {
 }
 
 .player-name {
-    font-weight: 700
+    font-weight: 700;
+    margin-top: 5px;
+    word-break: break-word;
+    max-width: 100%;
+    text-align: center
 }
 
 .flip {
@@ -312,7 +390,12 @@ body.dark-mode .card-back, body.dark-mode .card-face {
 
 #controls {
     text-align: center;
-    margin-top: 20px
+    margin-top: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 70px /* Add spacing to prevent overlap with fixed buttons */
 }
 
 .status-bar {
@@ -374,19 +457,21 @@ body.dark-mode .card-back, body.dark-mode .card-face {
     animation: cardThrow .8s ease-out forwards
 }
 
-.copyRoomLinkBtn, .leaveRoomBtn, .resetBtn {
+.copyRoomLinkBtn, .leaveRoomBtn, .resetBtn, .revealBtn {
     padding: 10px 20px;
     border: 0;
     color: #fff;
-    cursor: pointer
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center
 }
 
 .leaveRoomBtn {
     background-color: #ff1447;
-    position: fixed;
-    bottom: 60px;
-    left: 10px;
-    border-radius: 5px;
     transition: background-color .3s ease-in
 }
 
@@ -394,44 +479,144 @@ body.dark-mode .card-back, body.dark-mode .card-face {
     background-color: #fd365c
 }
 
-.copyRoomLinkBtn, .resetBtn {
+.copyRoomLinkBtn, .resetBtn, .revealBtn {
     background-color: #2196f3;
     transition: background-color .3s ease
-}
-
-.copyRoomLinkBtn {
-    position: fixed;
-    bottom: 60px;
-    right: 10px;
-    border-radius: 5px
 }
 
 .copyRoomLinkBtn:hover, .resetBtn:hover {
     background-color: #0b7dda
 }
 
-.resetBtn {
-    border-radius: 4px;
-    margin: 10px
+/* Mobile utility buttons repositioning */
+.fixed-buttons {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    position: fixed;
+    bottom: 60px;
+    left: 0;
+    right: 0;
+    padding: 0 10px;
+    box-sizing: border-box;
+    z-index: 100
+}
+
+@media (max-width: 992px) {
+    #playersList {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px
+    }
+    
+    #controls {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px
+    }
+    
+    .revealBtn, .resetBtn {
+        flex: 1;
+        min-width: 120px
+    }
 }
 
 @media (max-width: 768px) {
-    .card, button {
-        font-size: 1.1em
-    }
-
-    .card, .card-container {
-        width: 50px;
-        height: 70px
-    }
-
     button {
-        padding: 10px 14px
+        padding: 10px 14px;
+        font-size: 14px
     }
+    
+    #playersList {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 12px
+    }
+    
+    #playersList li {
+        height: 180px;
+        padding: 8px
+    }
+    
+    .card, .card-container, .card-back, .card-face, .card-placeholder {
+        width: 60px;
+        height: 90px
+    }
+    
+    .card-face, .card-back {
+        line-height: normal;
+        font-size: 18px;
+        font-weight: 700
+    }
+    
+    .card-display {
+        height: 110px
+    }
+    
+    /* Improve mobile button styling */
+    .copyRoomLinkBtn, .leaveRoomBtn {
+        padding: 8px 12px;
+        font-size: 14px;
+        max-width: 120px
+    }
+    
+    .revealBtn, .resetBtn {
+        padding: 12px;
+        font-size: 14px;
+        flex: 1;
+        margin: 5px
+    }
+    
+    #controls {
+        gap: 5px
+    }
+    
+    /* Move fixed buttons lower on mobile */
+    .fixed-buttons {
+        bottom: 50px
+    }
+}
 
-    #copyRoomLinkBtn, #leaveRoomBtn {
-        font-size: 1.2em;
-        padding: 12px 16px
+@media (max-width: 576px) {
+    #playersList {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 10px
+    }
+    
+    #playersList li {
+        height: 160px;
+        padding: 6px
+    }
+    
+    .card, .card-container, .card-back, .card-face, .card-placeholder {
+        width: 50px;
+        height: 75px
+    }
+    
+    .card-face, .card-back {
+        line-height: normal;
+        font-size: 16px;
+        font-weight: 700;
+        border-width: 3px
+    }
+    
+    .card-display {
+        height: 90px
+    }
+    
+    .copyRoomLinkBtn, .leaveRoomBtn {
+        font-size: 12px;
+        padding: 6px 8px;
+        max-width: 105px
+    }
+    
+    .revealBtn, .resetBtn {
+        font-size: 13px;
+        padding: 8px;
+        margin: 3px
+    }
+    
+    /* Additional spacing for smaller screens */
+    #controls {
+        margin-bottom: 60px
     }
 }
 
@@ -440,17 +625,103 @@ body.dark-mode .card-back, body.dark-mode .card-face {
         font-size: 1em
     }
 
-    .card, .card-container {
-        width: 45px;
-        height: 65px
-    }
-
-    #copyRoomLinkBtn, #leaveRoomBtn {
-        font-size: 1.2em;
-        padding: 14px 18px
-    }
-
     button {
-        font-size: 1em
+        font-size: 13px;
+        padding: 8px 10px
+    }
+    
+    #playersList {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px
+    }
+    
+    #playersList li {
+        padding: 5px;
+        height: 150px
+    }
+    
+    .player-name {
+        font-size: 14px
+    }
+    
+    .card, .card-container, .card-back, .card-face, .card-placeholder {
+        width: 45px;
+        height: 68px
+    }
+    
+    .card-face, .card-back {
+        line-height: normal;
+        font-size: 15px;
+        font-weight: 700;
+        border-width: 2px
+    }
+    
+    .card-display {
+        height: 80px
+    }
+    
+    .copyRoomLinkBtn, .leaveRoomBtn {
+        font-size: 11px;
+        padding: 5px 8px;
+        max-width: 95px
+    }
+    
+    .revealBtn, .resetBtn {
+        font-size: 12px;
+        padding: 6px;
+        margin: 2px
+    }
+    
+    /* Adjust bottom margin for smallest screens */
+    #controls {
+        margin-bottom: 50px
+    }
+    
+    /* Move fixed buttons up on smallest screens */
+    .fixed-buttons {
+        bottom: 45px
+    }
+}
+
+@media (max-width: 360px) {
+    #playersList {
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        gap: 6px
+    }
+    
+    #playersList li {
+        height: 140px;
+        padding: 4px
+    }
+    
+    .card, .card-container, .card-back, .card-face, .card-placeholder {
+        width: 40px;
+        height: 60px
+    }
+    
+    .card-face, .card-back {
+        line-height: normal;
+        font-size: 14px;
+        font-weight: 700;
+        border-width: 2px
+    }
+    
+    .card-display {
+        height: 70px
+    }
+    
+    .player-name {
+        font-size: 12px
+    }
+    
+    .copyRoomLinkBtn, .leaveRoomBtn {
+        font-size: 10px;
+        padding: 4px 6px;
+        max-width: 85px
+    }
+    
+    .revealBtn, .resetBtn {
+        font-size: 11px;
+        padding: 5px
     }
 }

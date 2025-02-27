@@ -3,6 +3,7 @@ let stompClient = null;
 let playerId = null;
 let joined = false;
 let lastCards = {}
+let knownPlayers = {} // Track players we've seen before
 
 function connect(callback) {
     let socket = new SockJS('/ws');
@@ -52,7 +53,14 @@ function updateRoom(data) {
     // Process each player's state
     data.players.forEach(function(player) {
         let li = document.createElement('li');
-        li.className = "player";
+        
+        // Check if this is a new player (first time we're seeing this player ID)
+        if (!knownPlayers[player.id]) {
+            li.className = "player new-player";
+            knownPlayers[player.id] = true;
+        } else {
+            li.className = "player";
+        }
 
         let cardDiv = document.createElement('div');
         cardDiv.className = "card-display";
@@ -71,6 +79,9 @@ function updateRoom(data) {
         if (data.revealed) {
             // Hide card selection area when revealed
             cardArea.style.display = 'none';
+            // Clear any existing cards in container first
+            container.innerHTML = '';
+            
             // When cards are revealed, display the card face for everyone with a flip animation if new.
             let cardFace = document.createElement('div');
             if (player.id === playerId) {
@@ -97,6 +108,9 @@ function updateRoom(data) {
 
         } else {
             // Unrevealed state: show placeholder if no card has been played.
+            // Clear any existing cards in container first
+            container.innerHTML = '';
+            
             if (player.card && player.card.trim() !== "") {
                 if (player.id === playerId) {
                     // For current user: show the actual card (face) with a throw animation if it's new.
@@ -264,4 +278,82 @@ document.addEventListener('DOMContentLoaded', function () {
     window.addEventListener("beforeunload", function(event) {
         leaveRoom();
     });
+    
+    // Simulation functions (callable from browser console)
+    window.simulatedPlayers = [];
+    
+    /**
+     * Simulates players joining the room with random names
+     * Call from browser console with: simulatePlayers(5)
+     * @param {number} amount - Number of players to simulate
+     */
+    window.simulatePlayers = function(amount) {
+        if (!joined) {
+            console.error("You must join the room first before simulating other players");
+            return;
+        }
+        
+        const firstNames = ["Alex", "Jamie", "Taylor", "Jordan", "Casey", "Riley", "Avery", 
+                           "Quinn", "Skyler", "Morgan", "Reese", "Blake", "Dakota", "Hayden", 
+                           "Parker", "Peyton", "Charlie", "Drew", "Emerson", "Finley"];
+        
+        const lastNames = ["Smith", "Johnson", "Williams", "Jones", "Brown", "Miller", "Davis", 
+                          "Garcia", "Rodriguez", "Wilson", "Martinez", "Anderson", "Taylor", 
+                          "Thomas", "Hernandez", "Moore", "Martin", "Lee", "Thompson", "White"];
+        
+        for (let i = 0; i < amount; i++) {
+            const randomFirstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+            const randomLastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+            const simulatedName = `${randomFirstName} ${randomLastName}`;
+            const simulatedId = 'sim-player-' + Math.floor(Math.random() * 1000000);
+            
+            // Simulate a player joining
+            const joinMsg = {
+                type: "JOIN",
+                roomId: roomId,
+                playerId: simulatedId,
+                playerName: simulatedName
+            };
+            
+            window.simulatedPlayers.push({
+                id: simulatedId,
+                name: simulatedName
+            });
+            
+            sendMessage(joinMsg);
+            console.log(`Simulated player joined: ${simulatedName} (${simulatedId})`);
+        }
+        
+        console.log(`${amount} simulated players added. Use playSimulation() to have them play cards.`);
+    };
+    
+    /**
+     * Makes all simulated players play random cards with a delay between them
+     * Call from browser console with: playSimulation()
+     */
+    window.playSimulation = function() {
+        if (window.simulatedPlayers.length === 0) {
+            console.error("No simulated players found. Run simulatePlayers(amount) first.");
+            return;
+        }
+        
+        const cardValues = ["0", "1/2", "1", "2", "3", "5", "8", "13", "20", "40", "100", "?"];
+        
+        window.simulatedPlayers.forEach((player, index) => {
+            setTimeout(() => {
+                const randomCard = cardValues[Math.floor(Math.random() * cardValues.length)];
+                const cardMsg = {
+                    type: "CARD_PLAYED",
+                    roomId: roomId,
+                    playerId: player.id,
+                    card: randomCard
+                };
+                
+                sendMessage(cardMsg);
+                console.log(`Simulated player ${player.name} played card: ${randomCard}`);
+            }, 800 * index); // Delay each player's card selection by 800ms
+        });
+        
+        console.log("Simulation started. Players will play cards with a delay between them.");
+    };
 });
