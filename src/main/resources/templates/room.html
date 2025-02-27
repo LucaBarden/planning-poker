@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raum - [[${roomName}]]</title>
     <link rel="stylesheet" type="text/css" href="/css/styles.css">
     <!-- Include SockJS and STOMP from CDN -->
@@ -11,7 +12,7 @@
 <body>
 <div class="container">
     <h1>Raum: <span th:text="${roomName}">Raum Name</span></h1>
-    <!-- Join form: ask for the user’s name -->
+    <!-- Join form: ask for the user's name -->
     <div id="userForm">
         <label for="userName">Namen eingeben:</label>
         <input type="text" id="userName" placeholder="Dein Name">
@@ -44,9 +45,10 @@
         <div id="controls">
             <button class="revealBtn" id="revealBtn">Karten aufdecken</button>
             <button class="resetBtn" id="resetBtn">🔄 Reset</button>
-            <!-- New Copy Room Link button -->
-            <button class="copyRoomLinkBtn" id="copyRoomLinkBtn">📎 Raumlink kopieren</button>
+        </div>
+        <div class="fixed-buttons">
             <button class="leaveRoomBtn" id="leaveRoomBtn">Raum verlassen</button>
+            <button class="copyRoomLinkBtn" id="copyRoomLinkBtn">📎 Raumlink kopieren</button>
         </div>
     </div>
 </div>
