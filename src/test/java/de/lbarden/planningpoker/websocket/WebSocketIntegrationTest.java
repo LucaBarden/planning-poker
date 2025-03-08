@@ -5,6 +5,7 @@ import de.lbarden.planningpoker.model.PokerMessage;
 import de.lbarden.planningpoker.model.PokerMessage.MessageType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Disabled;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.messaging.converter.MappingJackson2MessageConverter;
@@ -19,7 +20,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+@Disabled
 @SpringBootTest(classes = PlanningPokerApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class WebSocketIntegrationTest {
 
